@@ -317,7 +317,7 @@
                               "name": "${APPLICATION_NAME}-http",
                               "containerPort": 8080,
                               "protocol": "TCP"
-                           },
+                           }
                         ],
                         "env": [
                            {
