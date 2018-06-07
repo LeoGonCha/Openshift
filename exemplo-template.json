@@ -5,7 +5,7 @@
       "name": "hall-nodejs",
       "annotations": {
          "iconClass": "icon-jboss",
-         "description": "Template NodeJS + Mongodb"
+         "description": "Template NodeJS"
       }
    },
    "labels": {
@@ -125,7 +125,7 @@
                   "from": {
                      "kind": "ImageStreamTag",
                      "namespace": "openshift",
-                     "name": "nodejs:8"
+                     "name": "nodejs:6"
                   },
                   "env": [
                      {
