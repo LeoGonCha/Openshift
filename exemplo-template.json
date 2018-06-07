@@ -4,7 +4,7 @@
    "metadata": {
       "name": "hall-nodejs",
       "annotations": {
-         "iconClass": "icon-nodejs",
+         "iconClass": "icon-jboss",
          "description": "Template NodeJS + Mongodb"
       }
    },
