@@ -318,11 +318,6 @@
                               "containerPort": 8080,
                               "protocol": "TCP"
                            },
-                           {
-                              "name": "${APPLICATION_NAME}-ping",
-                              "containerPort": 8888,
-                              "protocol": "TCP"
-                           }
                         ],
                                 "readinessProbe": {
                                   "timeoutSeconds": 3,
