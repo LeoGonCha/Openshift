@@ -312,13 +312,11 @@
                      {
                         "name": "${APPLICATION_NAME}",
                         "image": "${APPLICATION_NAME}",
-                        "ports": [
-                           {
+                        "ports": {
                               "name": "${APPLICATION_NAME}-http",
                               "containerPort": 8080,
                               "protocol": "TCP"
-                           }
-                        ],
+                        },
                         "env": [
                            {
                               "name": "OPENSHIFT_DNS_PING_SERVICE_NAME",
