@@ -162,114 +162,6 @@
          "kind": "DeploymentConfig",
          "apiVersion": "v1",
          "metadata": {
-            "name": "${APPLICATION_NAME}-mongodb"
-         },
-         "spec": {
-            "strategy": {
-               "type": "Recreate"
-            },
-            "triggers": [
-               {
-                  "type": "ImageChange",
-                  "imageChangeParams": {
-                     "automatic": true,
-                     "containerNames": [
-                        "${APPLICATION_NAME}-mongodb"
-                     ],
-                     "from": {
-                        "kind": "ImageStreamTag",
-                        "namespace": "openshift",
-                        "name": "mongodb:2.6"
-                     }
-                  }
-               },
-               {
-                  "type": "ConfigChange"
-               }
-            ],
-            "replicas": 1,
-            "selector": {
-               "deploymentConfig": "${APPLICATION_NAME}-mongodb"
-            },
-            "template": {
-               "metadata": {
-                  "name": "${APPLICATION_NAME}-mongodb",
-                  "labels": {
-                     "deploymentConfig": "${APPLICATION_NAME}-mongodb"
-                  }
-               },
-               "spec": {
-                  "volumes": [
-                     {
-                        "name": "${APPLICATION_NAME}-mongodb-data",
-                        "emptyDir": {}
-                     }
-                  ],
-                  "containers": [
-                     {
-                        "name": "${APPLICATION_NAME}-mongodb",
-                        "image": "mongodb",
-                        "ports": [
-                           {
-                              "containerPort": 27017,
-                              "protocol": "TCP"
-                           }
-                        ],
-                        "env": [
-                           {
-                              "name": "MONGODB_USER",
-                              "value": "${MONGODB_USER}"
-                           },
-                           {
-                              "name": "MONGODB_PASSWORD",
-                              "value": "${MONGODB_PASSWORD}"
-                           },
-                           {
-                              "name": "MONGODB_DATABASE",
-                              "value": "${MONGODB_DATABASE}"
-                           },
-                           {
-                              "name": "MONGODB_ADMIN_PASSWORD",
-                              "value": "${MONGODB_ADMIN_PASSWORD}"
-                           },
-                           {
-                              "name": "MONGODB_NOPREALLOC",
-                              "value": "${MONGODB_NOPREALLOC}"
-                           },
-                           {
-                              "name": "MONGODB_SMALLFILES",
-                              "value": "${MONGODB_SMALLFILES}"
-                           },
-                           {
-                              "name": "MONGODB_QUIET",
-                              "value": "${MONGODB_QUIET}"
-                           }
-                        ],
-                        "resources": {},
-                        "volumeMounts": [
-                           {
-                              "name": "${APPLICATION_NAME}-mongodb-data",
-                              "mountPath": "/var/lib/mongodb/data"
-                           }
-                        ],
-                        "terminationMessagePath": "/dev/termination-log",
-                        "imagePullPolicy": "IfNotPresent",
-                        "securityContext": {
-                           "capabilities": {},
-                           "privileged": false
-                        }
-                     }
-                  ],
-                  "restartPolicy": "Always",
-                  "dnsPolicy": "ClusterFirst"
-               }
-            }
-         }
-      },
-      {
-         "kind": "DeploymentConfig",
-         "apiVersion": "v1",
-         "metadata": {
             "name": "${APPLICATION_NAME}",
             "labels": {
                "deploymentConfig": "${APPLICATION_NAME}"
@@ -317,32 +209,6 @@
                               "containerPort": 8080,
                               "protocol": "TCP"
                         },
-                        "env": [
-                           {
-                              "name": "OPENSHIFT_DNS_PING_SERVICE_NAME",
-                              "value": "${APPLICATION_NAME}-ping"
-                           },
-                           {
-                              "name": "OPENSHIFT_DNS_PING_SERVICE_PORT",
-                              "value": "8888"
-                           },
-                           {
-                              "name": "MONGODB_USER",
-                              "value": "${MONGODB_USER}"
-                           },
-                           {
-                              "name": "MONGODB_PASSWORD",
-                              "value": "${MONGODB_PASSWORD}"
-                           },
-                           {
-                              "name": "MONGODB_DATABASE",
-                              "value": "${MONGODB_DATABASE}"
-                           },
-                           {
-                              "name": "MONGODB_ADMIN_PASSWORD",
-                              "value": "${MONGODB_ADMIN_PASSWORD}"
-                           }
-                        ],
                         "resources": {},
                         "terminationMessagePath": "/dev/termination-log",
                         "imagePullPolicy": "Always",
@@ -379,24 +245,6 @@
          "kind": "Service",
          "apiVersion": "v1",
          "metadata": {
-            "name": "mongodb"
-         },
-         "spec": {
-            "ports": [
-               {
-                  "port": 27017,
-                  "targetPort": 27017
-               }
-            ],
-            "selector": {
-               "deploymentConfig": "${APPLICATION_NAME}-mongodb"
-            }
-         }
-      },
-      {
-         "kind": "Service",
-         "apiVersion": "v1",
-         "metadata": {
             "name": "${APPLICATION_NAME}",
             "annotations": {
                "description": "The web server's http port"
@@ -408,27 +256,6 @@
                   "protocol": "TCP",
                   "port": 8080,
                   "targetPort": 8080
-               }
-            ],
-            "selector": {
-               "deploymentConfig": "${APPLICATION_NAME}"
-            }
-         }
-      },
-      {
-         "kind": "Service",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "${APPLICATION_NAME}-ping",
-            "annotations": {
-               "description": "Ping service for clustered applications"
-            }
-         },
-         "spec": {
-            "ports": [
-               {
-                  "port": 8888,
-                  "targetPort": 8888
                }
             ],
             "selector": {
