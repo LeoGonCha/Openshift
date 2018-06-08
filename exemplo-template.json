@@ -2,21 +2,21 @@
    "kind": "Template",
    "apiVersion": "v1",
    "metadata": {
-      "name": "hall-nodejs",
+      "name": "App-FBD",
       "annotations": {
          "iconClass": "icon-jboss",
-         "description": "Template NodeJS"
+         "description": "Template de aplicação frontend+backend+db2"
       }
    },
    "labels": {
-      "application": "hall",
-      "createdBy": "template-hall-nodejs"
+      "application": "fbd",
+      "createdBy": "template-App-FBD"
    },
    "parameters": [
       {
          "description": "The name for the application.",
          "name": "APPLICATION_NAME",
-         "value": "hall"
+         "value": "classificados"
       },
       {
          "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
@@ -25,7 +25,7 @@
       {
          "description": "Git source URI for application",
          "name": "GIT_URI",
-         "value": "https://github.com/LeoGonCha/hallweb.git"
+         "value": "https://github.com/apetroni/openshift3mlbparks.git"
       },
       {
          "description": "Git branch/tag reference",
@@ -40,36 +40,36 @@
       },
       {
          "description": "Database name",
-         "name": "MONGODB_DATABASE",
+         "name": "DB2_DATABASE",
          "value": "root"
       },
       {
          "description": "Disable data file preallocation.",
-         "name": "MONGODB_NOPREALLOC"
+         "name": "DB2_NOPREALLOC"
       },
       {
-         "description": "Set MongoDB to use a smaller default data file size.",
-         "name": "MONGODB_SMALLFILES"
+         "description": "Set DB2 to use a smaller default data file size.",
+         "name": "DB2_SMALLFILES"
       },
       {
-         "description": "Runs MongoDB in a quiet mode that attempts to limit the amount of output.",
-         "name": "MONGODB_QUIET"
+         "description": "Runs DB2 in a quiet mode that attempts to limit the amount of output.",
+         "name": "DB2_QUIET"
       },
       {
          "description": "Database user name",
-         "name": "MONGODB_USER",
+         "name": "DB2_USER",
          "from": "user[a-zA-Z0-9]{3}",
          "generate": "expression"
       },
       {
          "description": "Database user password",
-         "name": "MONGODB_PASSWORD",
+         "name": "DB2_PASSWORD",
          "from": "[a-zA-Z0-9]{8}",
          "generate": "expression"
       },
       {
          "description": "Database admin password",
-         "name": "MONGODB_ADMIN_PASSWORD",
+         "name": "DB2_ADMIN_PASSWORD",
          "from": "[a-zA-Z0-9]{8}",
          "generate": "expression"
       },
@@ -88,130 +88,79 @@
    ],
    "objects": [
       {
-         "kind": "BuildConfig",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "${APPLICATION_NAME}"
-         },
-         "spec": {
-            "triggers": [
-               {
-                  "type": "Generic",
-                  "generic": {
-                     "secret": "${GENERIC_TRIGGER_SECRET}"
-                  }
-               },
-               {
-                  "type": "GitHub",
-                  "github": {
-                     "secret": "${GITHUB_TRIGGER_SECRET}"
-                  }
-               },
-               {
-                  "type": "ImageChange",
-                  "imageChange": {}
-               }
-            ],
-            "source": {
-               "type": "Git",
-               "git": {
-                  "uri": "${GIT_URI}",
-                  "ref": "${GIT_REF}"
-               }
-            },
-            "strategy": {
-               "type": "Source",
-               "sourceStrategy": {
-                  "from": {
-                     "kind": "ImageStreamTag",
-                     "namespace": "openshift",
-                     "name": "nodejs:6"
-                  },
-                  "env": [
-                     {
-                        "name": "MAVEN_MIRROR_URL",
-                        "value": "${MAVEN_MIRROR_URL}"
-                     }
-                  ]
-               }
-            },
-            "output": {
-               "to": {
-                  "kind": "ImageStreamTag",
-                  "name": "${APPLICATION_NAME}:latest"
-               }
-            }
-         }
-      },
-      {
-         "kind": "ImageStream",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "${APPLICATION_NAME}"
-         },
-         "spec": {
-            "dockerImageRepository": "",
-            "tags": [
-               {
-                  "name": "latest"
-               }
-            ]
-         }
-      },
-      {
          "kind": "DeploymentConfig",
          "apiVersion": "v1",
          "metadata": {
-            "name": "${APPLICATION_NAME}",
-            "labels": {
-               "deploymentConfig": "${APPLICATION_NAME}"
-            }
+            "name": "${APPLICATION_NAME}-db2"
          },
          "spec": {
-            "strategy": {
-               "type": "Recreate"
-            },
-            "triggers": [
-               {
-                  "type": "ImageChange",
-                  "imageChangeParams": {
-                     "automatic": true,
-                     "containerNames": [
-                        "${APPLICATION_NAME}"
-                     ],
-                     "from": {
-                        "kind": "ImageStreamTag",
-                        "name": "${APPLICATION_NAME}:latest"
-                     }
-                  }
-               },
-               {
-                  "type": "ConfigChange"
-               }
-            ],
             "replicas": 1,
             "selector": {
-               "deploymentConfig": "${APPLICATION_NAME}"
+               "deploymentConfig": "${APPLICATION_NAME}-db2"
             },
             "template": {
                "metadata": {
+                  "name": "${APPLICATION_NAME}-db2",
                   "labels": {
-                     "deploymentConfig": "${APPLICATION_NAME}"
+                     "deploymentConfig": "${APPLICATION_NAME}-db2"
                   }
                },
                "spec": {
+                  "volumes": [
+                     {
+                        "name": "${APPLICATION_NAME}-db2-data",
+                        "emptyDir": {}
+                     }
+                  ],
                   "containers": [
                      {
-                        "name": "${APPLICATION_NAME}",
-                        "image": "${APPLICATION_NAME}",
-                        "ports": {
-                              "name": "${APPLICATION_NAME}-http",
-                              "containerPort": 8080,
+                        "name": "${APPLICATION_NAME}-db2",
+                        "image": "db2:1.1.1",
+                        "ports": [
+                           {
+                              "containerPort": 50000,
                               "protocol": "TCP"
-                        },
+                           }
+                        ],
+                        "env": [
+                           {
+                              "name": "DB2_USER",
+                              "value": "${DB2_USER}"
+                           },
+                           {
+                              "name": "DB2_PASSWORD",
+                              "value": "${DB2_PASSWORD}"
+                           },
+                           {
+                              "name": "DB2_DATABASE",
+                              "value": "${DB2_DATABASE}"
+                           },
+                           {
+                              "name": "DB2_ADMIN_PASSWORD",
+                              "value": "${DB2_ADMIN_PASSWORD}"
+                           },
+                           {
+                              "name": "DB2_NOPREALLOC",
+                              "value": "${DB2_NOPREALLOC}"
+                           },
+                           {
+                              "name": "DB2_SMALLFILES",
+                              "value": "${DB2_SMALLFILES}"
+                           },
+                           {
+                              "name": "DB2_QUIET",
+                              "value": "${DB2_QUIET}"
+                           }
+                        ],
                         "resources": {},
+                        "volumeMounts": [
+                           {
+                              "name": "${APPLICATION_NAME}-db2-data",
+                              "mountPath": "/var/lib/db2/data"
+                           }
+                        ],
                         "terminationMessagePath": "/dev/termination-log",
-                        "imagePullPolicy": "Always",
+                        "imagePullPolicy": "IfNotPresent",
                         "securityContext": {
                            "capabilities": {},
                            "privileged": false
@@ -225,41 +174,20 @@
          }
       },
       {
-         "kind": "Route",
-         "apiVersion": "v1",
-         "metadata": {
-            "name": "${APPLICATION_NAME}",
-            "annotations": {
-               "description": "Route for application's http service"
-            }
-         },
-         "spec": {
-            "host": "${APPLICATION_HOSTNAME}",
-            "to": {
-               "kind": "Service",
-               "name": "${APPLICATION_NAME}"
-            }
-         }
-      },
-      {
          "kind": "Service",
          "apiVersion": "v1",
          "metadata": {
-            "name": "${APPLICATION_NAME}",
-            "annotations": {
-               "description": "The web server's http port"
-            }
+            "name": "db2"
          },
          "spec": {
             "ports": [
                {
-                  "protocol": "TCP",
-                  "port": 8080,
-                  "targetPort": 8080
+                  "port": 50000,
+                  "targetPort": 50000
                }
             ],
             "selector": {
-               "deploymentConfig": "${APPLICATION_NAME}"
+               "deploymentConfig": "${APPLICATION_NAME}-db2"
             }
          }
       }
