@@ -2,7 +2,7 @@
    "kind": "Template",
    "apiVersion": "v1",
    "metadata": {
-      "name": "App-FBD",
+      "name": "appfbd",
       "annotations": {
          "iconClass": "icon-jboss",
          "description": "Template de aplicação frontend+backend+db2"
